@@ -19,7 +19,7 @@ async function createRelease(octokit, owner, repo, tag) {
       });
 }
 
-async function getRelease(owner, repo, tag) {
+async function getRelease(octokit, owner, repo, tag) {
     return octokit.request('GET /repos/' + owner + '/' + repo + '/releases/tags/' + tag, {
         owner: 'OWNER',
         repo: 'REPO',
@@ -45,7 +45,7 @@ async function createReleaseTag(octokit, owner, repo) {
         if (i != 0){
             version1 = version + '.' + i;
         }
-        release = getRelease(owner, repo, version);
+        release = getRelease(octokit, owner, repo, version);
         console.log(release);
         if (release.status == 404){
             return createRelease(octokit, owner, repo);
