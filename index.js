@@ -48,7 +48,8 @@ async function createReleaseTag(octokit, owner, repo) {
         try{
             release = await getRelease(octokit, owner, repo, version1);
         } catch(e) {
-            return createRelease(octokit, owner, repo, version1);   
+            await createRelease(octokit, owner, repo, version1);
+            return version1;
         }
         i++;
     }
@@ -72,6 +73,7 @@ async function run() {
     // const octokit = github.getOctokit(myToken, {userAgent: "MyActionVersion1"});
 
     release = await createReleaseTag(octokit, owner, repo);
+    core.setOutput("releaseTag", release);
 
     
 
