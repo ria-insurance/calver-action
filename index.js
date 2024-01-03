@@ -50,6 +50,7 @@ async function createReleaseTag(octokit, owner, repo) {
         } catch(e) {
             return createRelease(octokit, owner, repo, version1);   
         }
+        i++;
     }
 }
 
