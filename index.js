@@ -21,9 +21,9 @@ async function createRelease(octokit, owner, repo, tag) {
 
 async function getRelease(octokit, owner, repo, tag) {
     return octokit.request('GET /repos/' + owner + '/' + repo + '/releases/tags/' + tag, {
-        owner: 'OWNER',
-        repo: 'REPO',
-        tag: 'TAG',
+        owner: owner,
+        repo: repo,
+        tag: tag,
         headers: {
           'X-GitHub-Api-Version': '2022-11-28'
         }
