@@ -2,12 +2,12 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const { version } = require('uuid');
 
-async function createRelease(octokit, owner, repo, tag) {
+async function createRelease(octokit, owner, repo, tag, target_commitish) {
     return octokit.request('POST /repos/'+ owner +'/'+ repo +'/releases', {
         owner: 'ria-insurance',
         repo: 'calver-action',
         tag_name: tag,
-        target_commitish: 'main',
+        target_commitish: target_commitish,
         name: tag,
         body: 'Description of the release',
         draft: false,
@@ -37,7 +37,7 @@ function getVersionPrefix(){
     return currentDate[2] + '-' + currentDate[1] + '-' + currentDate[0];
 }
 
-async function createReleaseTag(octokit, owner, repo) {
+async function createReleaseTag(octokit, owner, repo, target_commitish) {
     i = 0;
     versionPrefix = getVersionPrefix();
     while(true) {
@@ -49,7 +49,7 @@ async function createReleaseTag(octokit, owner, repo) {
         try{
             release = await getRelease(octokit, owner, repo, version1);
         } catch(e) {
-            await createRelease(octokit, owner, repo, version1);
+            await createRelease(octokit, owner, repo, version1, target_commitish);
             return version1;
         }
         i++;
@@ -67,13 +67,15 @@ async function run() {
 
     const repo = core.getInput("repo");
 
+    const target_commitish = core.getInput("commitId");
+
     const octokit = github.getOctokit(myToken);
 
 
     // You can also pass in additional options as a second parameter to getOctokit
     // const octokit = github.getOctokit(myToken, {userAgent: "MyActionVersion1"});
 
-    release = await createReleaseTag(octokit, owner, repo);
+    release = await createReleaseTag(octokit, owner, repo, target_commitish);
     core.setOutput("releaseTag", release);
 
     
