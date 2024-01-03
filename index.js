@@ -1,5 +1,56 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
+const { version } = require('uuid');
+
+async function createRelease(octokit, owner, repo, tag) {
+    return octokit.request('POST /repos/'+ owner +'/'+ repo +'/releases', {
+        owner: 'ria-insurance',
+        repo: 'calver-action',
+        tag_name: tag,
+        target_commitish: 'main',
+        name: tag,
+        body: 'Description of the release',
+        draft: false,
+        prerelease: false,
+        generate_release_notes: true,
+        headers: {
+          'X-GitHub-Api-Version': '2022-11-28'
+        }
+      });
+}
+
+async function getRelease(owner, repo, tag) {
+    return octokit.request('GET /repos/' + owner + '/' + repo + '/releases/tags/' + tag, {
+        owner: 'OWNER',
+        repo: 'REPO',
+        tag: 'TAG',
+        headers: {
+          'X-GitHub-Api-Version': '2022-11-28'
+        }
+      })
+}
+
+function getVersionPrefix(){
+    currentDate = new Date().toLocaleString('en-gb', { timeZone: 'Asia/Kolkata' })
+    currentDate = currentDate.split(',')[0]
+    currentDate = currentDate.split('/')
+    return currentDate[2] + '-' + currentDate[1] + '-' + currentDate[0];
+}
+
+async function createReleaseTag(octokit, owner, repo) {
+    i = 0;
+    versionPrefix = getVersionPrefix();
+    while(true) {
+        version = versionPrefix;
+        if (i != 0){
+            version = version + '.' + i;
+        }
+        
+        if (getRelease(owner, repo, version).status == 404){
+            createRelease(octokit, owner, repo);
+        }
+    }
+}
 
 async function run() {
     // This should be a token with access to your repository scoped in as a secret.
@@ -8,37 +59,22 @@ async function run() {
     // https://help.github.com/en/actions/automating-your-workflow-with-github-actions/authenticating-with-the-github_token#about-the-github_token-secret
     const myToken = core.getInput('myToken');
 
+    const owner = core.getInput('owner');
+
+    const repo = core.getInput("repo");
+
     const octokit = github.getOctokit(myToken);
 
-    const releases = await octokit.request('GET /repos/ria-insurance/calver-action/releases', {
-        owner: 'ria-insurance',
-        repo: 'calver-action',
-        headers: {
-          'X-GitHub-Api-Version': '2022-11-28'
-        }
-      });
-
-      await octokit.request('POST /repos/ria-insurance/calver-action/releases', {
-        owner: 'ria-insurance',
-        repo: 'calver-action',
-        tag_name: 'v1.0.3',
-        target_commitish: 'main',
-        name: 'v1.0.3',
-        body: 'Description of the release',
-        draft: false,
-        prerelease: false,
-        generate_release_notes: false,
-        headers: {
-          'X-GitHub-Api-Version': '2022-11-28'
-        }
-      })
+    const releases = 
 
     // You can also pass in additional options as a second parameter to getOctokit
     // const octokit = github.getOctokit(myToken, {userAgent: "MyActionVersion1"});
 
+    release = await createReleaseTag(octokit, owner, repo);
+
     
 
-    console.log(releases);
+    console.log(release);
 }
 
 run();
