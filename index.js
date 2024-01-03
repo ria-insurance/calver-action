@@ -1,15 +1,27 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
 
-try {
-  // `who-to-greet` input defined in action metadata file
-  const nameToGreet = core.getInput('who-to-greet');
-  console.log(`Hello ${nameToGreet}!`);
-  const time = (new Date()).toTimeString();
-  core.setOutput("time", time);
-  // Get the JSON webhook payload for the event that triggered the workflow
-  const payload = JSON.stringify(github.context.payload, undefined, 2)
-  console.log(`The event payload: ${payload}`);
-} catch (error) {
-  core.setFailed(error.message);
+async function run() {
+    // This should be a token with access to your repository scoped in as a secret.
+    // The YML workflow will need to set myToken with the GitHub Secret Token
+    // myToken: ${{ secrets.GITHUB_TOKEN }}
+    // https://help.github.com/en/actions/automating-your-workflow-with-github-actions/authenticating-with-the-github_token#about-the-github_token-secret
+    const myToken = "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";
+
+    const octokit = github.getOctokit(myToken);
+
+    const releases = await octokit.request('GET /repos/ria-insurance/calver-action/releases', {
+        owner: 'ria-insurance',
+        repo: 'calver-action',
+        headers: {
+          'X-GitHub-Api-Version': '2022-11-28'
+        }
+      });
+
+    // You can also pass in additional options as a second parameter to getOctokit
+    // const octokit = github.getOctokit(myToken, {userAgent: "MyActionVersion1"});
+
+    
+
+    console.log(releases);
 }
