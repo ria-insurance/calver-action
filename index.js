@@ -41,9 +41,9 @@ async function createReleaseTag(octokit, owner, repo) {
     i = 0;
     versionPrefix = getVersionPrefix();
     while(true) {
-        version = versionPrefix;
+        version1 = versionPrefix;
         if (i != 0){
-            version = version + '.' + i;
+            version1 = version + '.' + i;
         }
         
         if (getRelease(owner, repo, version).status == 404){
@@ -65,7 +65,6 @@ async function run() {
 
     const octokit = github.getOctokit(myToken);
 
-    const releases = 
 
     // You can also pass in additional options as a second parameter to getOctokit
     // const octokit = github.getOctokit(myToken, {userAgent: "MyActionVersion1"});
