@@ -48,7 +48,7 @@ async function createReleaseTag(octokit, owner, repo) {
         try{
             release = await getRelease(octokit, owner, repo, version1);
         } catch(e) {
-            return createRelease(octokit, owner, repo);   
+            return createRelease(octokit, owner, repo, version1);   
         }
     }
 }
