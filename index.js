@@ -43,8 +43,9 @@ async function createReleaseTag(octokit, owner, repo) {
     while(true) {
         version1 = versionPrefix;
         if (i != 0){
-            version1 = version + '.' + i;
+            version1 = version1 + '.' + i;
         }
+        console.log(version1);
         try{
             release = await getRelease(octokit, owner, repo, version1);
         } catch(e) {
