@@ -18,6 +18,21 @@ async function run() {
         }
       });
 
+      await octokit.request('POST /repos/ria-insurance/calver-action/releases', {
+        owner: 'ria-insurance',
+        repo: 'calver-action',
+        tag_name: 'v1.0.3',
+        target_commitish: 'main',
+        name: 'v1.0.3',
+        body: 'Description of the release',
+        draft: false,
+        prerelease: false,
+        generate_release_notes: false,
+        headers: {
+          'X-GitHub-Api-Version': '2022-11-28'
+        }
+      })
+
     // You can also pass in additional options as a second parameter to getOctokit
     // const octokit = github.getOctokit(myToken, {userAgent: "MyActionVersion1"});
 
