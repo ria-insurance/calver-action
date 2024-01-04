@@ -54,6 +54,7 @@ function getVersionPrefix(){
 }
 
 function getNextReleaseTag(latestTag) {
+    console.log("latest release " + latestTag);
     latestTagSplit = latestTag.split(".");
     version1 = getVersionPrefix();
     console.log("latest release " + latestTag);
