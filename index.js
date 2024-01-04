@@ -67,7 +67,7 @@ function getNextReleaseTag(latestTag) {
 }
 
 async function createReleaseTag(octokit, owner, repo, target_commitish) {
-    latestTag = getLatestReleaseTag(octokit, owner, repo);
+    latestTag = await getLatestReleaseTag(octokit, owner, repo);
     version1 = getNextReleaseTag(latestTag);
     await createRelease(octokit, owner, repo, version1, target_commitish);
     return version1;
