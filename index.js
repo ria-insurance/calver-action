@@ -31,6 +31,7 @@ async function getLatestRelease(octokit, owner, repo) {
 
 async function getLatestReleaseTag(octokit, owner, repo) {
     release = await getLatestRelease(octokit, owner, repo);
+    console.log(release);
     return release["tag_name"];
 }
 
@@ -55,6 +56,7 @@ function getVersionPrefix(){
 function getNextReleaseTag(latestTag) {
     latestTagSplit = latestTag.split(".");
     version1 = getVersionPrefix();
+    console.log("latest release " + latestTag);
 
     if (latestTagSplit.length > 1) {
         version1 = version1 + (parseInt(latestTagSplit[1]) + 1)
