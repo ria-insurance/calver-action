@@ -19,22 +19,6 @@ async function createRelease(octokit, owner, repo, tag, target_commitish) {
       });
 }
 
-async function getLatestRelease(octokit, owner, repo) {
-    return octokit.request('GET /repos/'+ owner +'/'+ repo +'/releases/latest', {
-        owner: owner,
-        repo: repo,
-        headers: {
-          'X-GitHub-Api-Version': '2022-11-28'
-        }
-      });
-}
-
-async function getLatestReleaseTag(octokit, owner, repo) {
-    release = await getLatestRelease(octokit, owner, repo);
-    console.log(release);
-    return release["tag_name"];
-}
-
 async function getRelease(octokit, owner, repo, tag) {
     return octokit.request('GET /repos/' + owner + '/' + repo + '/releases/tags/' + tag, {
         owner: owner,
@@ -50,27 +34,29 @@ function getVersionPrefix(){
     currentDate = new Date().toLocaleString('en-gb', { timeZone: 'Asia/Kolkata' })
     currentDate = currentDate.split(',')[0]
     currentDate = currentDate.split('/')
-    return currentDate[2] + '-' + currentDate[1] + '-' + currentDate[0];
-}
-
-function getNextReleaseTag(latestTag) {
-    console.log("latest release " + latestTag);
-    latestTagSplit = latestTag.split(".");
-    version1 = getVersionPrefix();
-    console.log("latest release " + latestTag);
-
-    if (latestTagSplit.length > 1) {
-        version1 = version1 + (parseInt(latestTagSplit[1]) + 1)
-    }
-
-    return version1;
+    return currentDate[2] + '-' + currentDate[1];
 }
 
 async function createReleaseTag(octokit, owner, repo, target_commitish) {
-    latestTag = await getLatestReleaseTag(octokit, owner, repo);
-    version1 = getNextReleaseTag(latestTag);
-    await createRelease(octokit, owner, repo, version1, target_commitish);
-    return version1;
+    i = 0;
+    versionPrefix = getVersionPrefix();
+    while(true) {
+        version1 = versionPrefix;
+        if (i != 0){
+            version1 = version1 + '.' + i;
+        }
+        console.log(version1);
+        try{
+            release = await getRelease(octokit, owner, repo, version1);
+        } catch(e) {
+            if (e["status"] == 404){
+                await createRelease(octokit, owner, repo, version1, target_commitish);
+                return version1;
+            }
+            throw e;
+        }
+        i++;
+    }
 }
 
 async function run() {
