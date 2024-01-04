@@ -19,6 +19,21 @@ async function createRelease(octokit, owner, repo, tag, target_commitish) {
       });
 }
 
+async function getLatestRelease(octokit, owner, repo) {
+    return octokit.request('GET /repos/'+ owner +'/'+ repo +'/releases/latest', {
+        owner: owner,
+        repo: repo,
+        headers: {
+          'X-GitHub-Api-Version': '2022-11-28'
+        }
+      });
+}
+
+async function getLatestReleaseTag(octokit, owner, repo) {
+    release = await getLatestRelease(octokit, owner, repo);
+    return release["tag_name"];
+}
+
 async function getRelease(octokit, owner, repo, tag) {
     return octokit.request('GET /repos/' + owner + '/' + repo + '/releases/tags/' + tag, {
         owner: owner,
@@ -37,23 +52,22 @@ function getVersionPrefix(){
     return currentDate[2] + '-' + currentDate[1] + '-' + currentDate[0];
 }
 
-async function createReleaseTag(octokit, owner, repo, target_commitish) {
-    i = 0;
-    versionPrefix = getVersionPrefix();
-    while(true) {
-        version1 = versionPrefix;
-        if (i != 0){
-            version1 = version1 + '.' + i;
-        }
-        console.log(version1);
-        try{
-            release = await getRelease(octokit, owner, repo, version1);
-        } catch(e) {
-            await createRelease(octokit, owner, repo, version1, target_commitish);
-            return version1;
-        }
-        i++;
+function getNextReleaseTag(latestTag) {
+    latestTagSplit = latestTag.split(".");
+    version1 = getVersionPrefix();
+
+    if (latestTagSplit.length > 1) {
+        version1 = version1 + (parseInt(latestTagSplit[1]) + 1)
     }
+
+    return version1;
+}
+
+async function createReleaseTag(octokit, owner, repo, target_commitish) {
+    latestTag = getLatestReleaseTag(octokit, owner, repo);
+    version1 = getNextReleaseTag(latestTag);
+    await createRelease(octokit, owner, repo, version1, target_commitish);
+    return version1;
 }
 
 async function run() {
