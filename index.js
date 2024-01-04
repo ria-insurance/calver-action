@@ -34,7 +34,7 @@ function getVersionPrefix(){
     currentDate = new Date().toLocaleString('en-gb', { timeZone: 'Asia/Kolkata' })
     currentDate = currentDate.split(',')[0]
     currentDate = currentDate.split('/')
-    return currentDate[2] + '-' + currentDate[1];
+    return currentDate[2] + '-' + currentDate[1] + '-' + currentDate[0];
 }
 
 async function createReleaseTag(octokit, owner, repo, target_commitish) {
