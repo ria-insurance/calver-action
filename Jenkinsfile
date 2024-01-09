@@ -1,12 +1,24 @@
 pipeline {
   agent any
+  parameters {
+    booleanParam(name: 'Service 1',
+      defaultValue: true,
+      description: 'Checkbox parameter')
+      booleanParam(name: 'Service 2',
+      defaultValue: true,
+      description: 'Checkbox parameter')
+      booleanParam(name: 'Service 3',
+      defaultValue: true,
+      description: 'Checkbox parameter')
+      booleanParam(name: 'Service_4',
+      defaultValue: true,
+      description: 'Checkbox parameter')
+  }
   stages {
-    stage('error') {
+    stage('Example') {
       steps {
-        input(message: 'Enter?', id: 'env', ok: 'E1, E2')
-        sleep(unit: 'SECONDS', time: 5)
+        echo "Trying: ${params.Service_4}"
       }
     }
-
   }
 }
