@@ -14,6 +14,7 @@ pipeline {
             script {
               if (params.Service_1){
                 echo "Deploying Service 1"
+                build job: "Deploy Service"
               }
             }
 
